@@ -94,7 +94,7 @@ export const ICONOS: Record<string, (label: string) => string> = {
       <path d="M0 0 v-40 a8 8 0 0 1 16 0 v26 l18 4 q10 4 8 16 l-6 24 h-34 q-10 -14 -16 -24 q-4 -10 6 -10z" fill="#e9b98f" ${S}/>
     </g>
     <path d="M30 30 l10 8 M22 50 l12 2 M40 18 l4 12" ${S}/>
-    <text x="150" y="40" font-family="Caveat, cursive" font-size="26" fill="${A}">¡rápido!</text>`, l),
+    <text x="128" y="38" font-family="Caveat, cursive" font-size="22" fill="${A}">¡rápido!</text>`, l),
   pausa: (l) => wrap(`
     <g transform="translate(62 80)">
       <circle r="44" fill="${B}" ${S}/>
