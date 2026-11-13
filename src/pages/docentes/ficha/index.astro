@@ -1,0 +1,87 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { EJEMPLO_FICHA } from '../../../content/docentes';
+const campos = [
+  { id: 'grado', label: 'Grado', tipo: 'input', ayuda: 'Ej.: Primero' },
+  { id: 'objetivo', label: 'Objetivo de la clase', tipo: 'textarea', ayuda: '¿Qué deben aprender?' },
+  { id: 'instruccion', label: 'Instrucción usada', tipo: 'textarea', ayuda: 'Lo que le pediste al asistente: objetivo, nivel, contexto y formato.' },
+  { id: 'borrador', label: 'Borrador del recurso', tipo: 'textarea', ayuda: 'Pegá aquí el resultado que vas a usar.' },
+  { id: 'fuente', label: 'Fuente consultada', tipo: 'input', ayuda: 'Documento o sitio con el que comprobaste.' },
+  { id: 'correcciones', label: 'Qué corregí', tipo: 'textarea', ayuda: 'Cambios hechos por vos: vocabulario, edad, exactitud, privacidad.' },
+  { id: 'uso', label: 'Cómo lo usaré en clase', tipo: 'textarea', ayuda: 'Momento de la clase y grupo.' },
+];
+---
+<Base title="Ficha de recurso" back={{ href: '/docentes/', label: 'Taller docente' }}>
+  <section class="contenedor ficha">
+    <div class="encab">
+      <div>
+        <span class="etiqueta">Taller docente</span>
+        <h1>Ficha de recurso</h1>
+        <p>Se guarda solo en este equipo. No se envía a ningún servidor.</p>
+      </div>
+      <p class="aviso arcilla">Usá ejemplos ficticios. No escribas nombres ni datos de estudiantes.</p>
+    </div>
+    <form id="form" class="tarjeta" autocomplete="off">
+      {campos.map((c) => (
+        <label class="campo">
+          <span>{c.label}</span>
+          <small>{c.ayuda}</small>
+          {c.tipo === 'input' ? <input name={c.id} /> : <textarea name={c.id} rows="3"></textarea>}
+        </label>
+      ))}
+      <div class="acciones">
+        <button type="button" class="btn btn-principal" data-a="guardar">Guardar en este equipo</button>
+        <button type="button" class="btn" data-a="descargar">Descargar ficha (.txt)</button>
+        <button type="button" class="btn" data-a="imprimir">Imprimir o guardar PDF</button>
+        <button type="button" class="btn btn-texto" data-a="ejemplo">Cargar ejemplo</button>
+        <button type="button" class="btn btn-texto" data-a="borrar">Borrar ficha</button>
+      </div>
+      <p class="estado" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+</Base>
+
+<script define:vars={{ EJEMPLO: EJEMPLO_FICHA, CAMPOS: campos.map((c) => [c.id, c.label]) }}>
+  const KEY = 'ficha-recurso-docente';
+  const form = document.getElementById('form');
+  const estado = document.querySelector('.estado');
+  const leer = () => Object.fromEntries(CAMPOS.map(([id]) => [id, form.elements[id].value]));
+  const poner = (d) => CAMPOS.forEach(([id]) => (form.elements[id].value = d[id] || ''));
+  const avisar = (t) => { estado.textContent = t; setTimeout(() => (estado.textContent = ''), 4000); };
+  try { const g = localStorage.getItem(KEY); if (g) poner(JSON.parse(g)); } catch {}
+  if (new URLSearchParams(location.search).get('ejemplo')) poner(EJEMPLO);
+  form.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-a]')?.dataset.a;
+    if (!a) return;
+    if (a === 'guardar') { try { localStorage.setItem(KEY, JSON.stringify(leer())); avisar('Ficha guardada en este equipo.'); } catch { avisar('Este navegador no permite guardar. Descargá la ficha.'); } }
+    if (a === 'descargar') {
+      const d = leer();
+      const txt = 'FICHA DE RECURSO DOCENTE\nTaller «Creamos un recurso para nuestra clase» · TCU-505\n\n' + CAMPOS.map(([id, l]) => `${l.toUpperCase()}\n${d[id] || '—'}\n`).join('\n');
+      const url = URL.createObjectURL(new Blob([txt], { type: 'text/plain;charset=utf-8' }));
+      const link = Object.assign(document.createElement('a'), { href: url, download: 'ficha-recurso.txt' });
+      link.click(); URL.revokeObjectURL(url); avisar('Ficha descargada.');
+    }
+    if (a === 'imprimir') window.print();
+    if (a === 'ejemplo') poner(EJEMPLO);
+    if (a === 'borrar') { if (confirm('¿Borrar la ficha de este equipo?')) { try { localStorage.removeItem(KEY); } catch {} poner({}); avisar('Ficha borrada.'); } }
+  });
+</script>
+
+<style>
+  .ficha { padding-top: 2rem; display: grid; gap: 1.2rem; max-width: 880px; }
+  .encab { display: grid; gap: .6rem; }
+  form { display: grid; gap: 1rem; }
+  .campo { display: grid; gap: .2rem; }
+  .campo span { font: 800 1.05rem/1.2 var(--f-control); }
+  .campo small { color: var(--tinta-suave); font-size: .9rem; }
+  .campo input, .campo textarea { font: 400 1.05rem/1.45 var(--f-lectura); padding: .7rem .8rem; border: 2px solid var(--linea); border-radius: 12px; background: #fff; color: var(--tinta); min-height: 48px; }
+  .campo input:focus, .campo textarea:focus { border-color: var(--bosque); outline: none; }
+  .acciones { display: flex; flex-wrap: wrap; gap: .6rem; }
+  .estado { font: 700 1rem/1 var(--f-control); color: var(--bosque); min-height: 1em; margin: 0; }
+  @media print {
+    :global(.cabecera), :global(.pie), .acciones, .aviso, .campo small { display: none !important; }
+    :global(body) { background: #fff; }
+    .tarjeta { box-shadow: none; border: 0; }
+    .campo textarea, .campo input { border: 1px solid #999; }
+  }
+</style>

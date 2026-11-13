@@ -1,0 +1,56 @@
+---
+import Base from '../../layouts/Base.astro';
+import { PORTADAS } from '../../lib/art';
+import { BLOQUES_TALLER, HERRAMIENTAS } from '../../content/docentes';
+const total = BLOQUES_TALLER.reduce((a, b) => a + b.min, 0);
+---
+<Base title="Taller docente" back={{ href: '/', label: 'Inicio' }}>
+  <section class="contenedor prep">
+    <div class="libro">
+      <div class="hoja">
+        <span class="etiqueta">Personal docente · {total / 60} horas</span>
+        <h1>Creamos un recurso para nuestra clase</h1>
+        <p>Cada docente sale del taller con un recurso real para su clase, creado con un asistente de inteligencia artificial y revisado por su propio criterio: vocabulario, edad, exactitud y privacidad.</p>
+        <div class="acciones">
+          <a class="btn btn-principal btn-grande" href="/docentes/presentacion/">Abrir taller</a>
+          <a class="btn" href="/docentes/ficha/?ejemplo=1">Ver ejemplo</a>
+          <a class="btn" href="/docentes/ficha/">Ficha en blanco</a>
+        </div>
+      </div>
+      <div class="hoja arte" set:html={PORTADAS.docentes} />
+    </div>
+
+    <div class="cols">
+      <div class="tarjeta">
+        <h2>Secuencia</h2>
+        <ol class="secuencia">
+          {BLOQUES_TALLER.map((b) => <li><span>{b.titulo}</span><small>{b.min} min</small></li>)}
+        </ol>
+      </div>
+      <div class="tarjeta">
+        <h2>Preparar antes</h2>
+        <ul>
+          <li>Elegir un asistente principal según el acceso del personal:
+            <span class="herr">{HERRAMIENTAS.map((h) => <a href={h.href} target="_blank" rel="noopener">{h.nombre}</a>)}</span>
+          </li>
+          <li>Un documento breve y autorizado para la práctica con <a href="https://notebooklm.google.com/" target="_blank" rel="noopener">NotebookLM</a>.</li>
+          <li>Revisar las condiciones del plan gratuito de <a href="https://suno.com/" target="_blank" rel="noopener">Suno</a>; la canción es opcional.</li>
+          <li>Si falla el internet, se practica la revisión con el ejemplo preparado de la ficha.</li>
+        </ul>
+        <p class="aviso arcilla">Regla del taller: no se usan nombres, fotos, notas ni expedientes de estudiantes.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .prep { padding-top: 2rem; display: grid; gap: 1.6rem; }
+  .arte { background: var(--papel); display: grid; place-items: center; }
+  .acciones { display: flex; gap: .8rem; flex-wrap: wrap; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .secuencia { display: grid; gap: .4rem; padding-left: 1.3rem; }
+  .secuencia li span { font-weight: 700; }
+  .secuencia li small { margin-left: .5rem; color: var(--tinta-suave); font-family: var(--f-control); }
+  .herr { display: inline-flex; gap: .6rem; margin-left: .3rem; flex-wrap: wrap; }
+  ul { display: grid; gap: .5rem; padding-left: 1.2rem; }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+</style>

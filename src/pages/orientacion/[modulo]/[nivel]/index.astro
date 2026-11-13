@@ -1,0 +1,10 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import OrientacionDeck from '../../../../components/OrientacionDeck.astro';
+import { MODULOS, NIVELES } from '../../../../content/orientacion';
+export function getStaticPaths() {
+  return MODULOS.flatMap((modulo) => NIVELES.map((n) => ({ params: { modulo: modulo.slug, nivel: n.id }, props: { modulo, nivel: n.id } })));
+}
+const { modulo, nivel } = Astro.props;
+---
+<Base title={`${modulo.titulo} · Orientación`} bare><OrientacionDeck modulo={modulo} nivel={nivel} /></Base>

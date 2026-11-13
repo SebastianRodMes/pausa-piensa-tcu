@@ -1,0 +1,106 @@
+---
+import '../styles/deck.css';
+interface Props { salir: string; titulo: string }
+const { salir, titulo } = Astro.props;
+---
+<div class="reveal" aria-label={titulo}>
+  <div class="slides">
+    <slot />
+  </div>
+</div>
+
+<nav class="barra" aria-label="Controles del facilitador">
+  <a href={salir} title="Salir de la presentación">✕ Salir</a>
+  <span class="sep"></span>
+  <button type="button" data-accion="anterior" aria-label="Anterior">◀</button>
+  <button type="button" data-accion="escuchar" title="Escuchar la consigna (tecla E)">🔊 Escuchar</button>
+  <button type="button" data-accion="siguiente" aria-label="Siguiente">▶</button>
+  <span class="sep"></span>
+  <button type="button" data-accion="notas" aria-pressed="false" title="Notas solo para el facilitador">Notas</button>
+  <button type="button" data-accion="pantalla" title="Pantalla completa (tecla F)">⛶</button>
+</nav>
+<aside class="panel-notas" aria-live="polite">
+  <h4>Notas del facilitador</h4>
+  <div data-notas></div>
+  <p style="margin-top:14px;font-size:14px;color:#5f6455">Consejo: con la tecla <b>S</b> se abre la vista del presentador en otra ventana, para que las notas no se vean en el proyector.</p>
+</aside>
+
+<script>
+  import Reveal from 'reveal.js';
+  import Notes from 'reveal.js/plugin/notes';
+  import 'reveal.js/reveal.css';
+  import { hablar, detenerVoz } from '../lib/voz';
+
+  const deck = new Reveal({
+    width: 1280, height: 720, margin: 0.04, hash: true, controls: true, progress: true,
+    center: false, transition: 'fade', backgroundTransition: 'none', plugins: [Notes],
+  });
+
+  const panel = document.querySelector<HTMLElement>('.panel-notas')!;
+  const notasEl = panel.querySelector<HTMLElement>('[data-notas]')!;
+  const btnNotas = document.querySelector<HTMLButtonElement>('[data-accion="notas"]')!;
+
+  function slideActual(): HTMLElement { return deck.getCurrentSlide() as HTMLElement; }
+  function pintarNotas() {
+    const aside = slideActual()?.querySelector('aside.notes');
+    notasEl.innerHTML = aside ? aside.innerHTML : '<p>Sin notas para esta pantalla.</p>';
+  }
+  function escuchar() {
+    const s = slideActual();
+    const revelado = s?.querySelector<HTMLElement>('[data-revelado] .respuesta.visible');
+    const texto = s?.dataset.consigna || '';
+    hablar(texto);
+    if (revelado) hablar(revelado.innerText, false);
+  }
+
+  deck.initialize().then(() => {
+    pintarNotas();
+    deck.on('slidechanged', () => { detenerVoz(); pintarNotas(); });
+    deck.addKeyBinding({ keyCode: 69, key: 'E', description: 'Escuchar la consigna' }, escuchar);
+    (window as any).__deck = deck;
+    document.dispatchEvent(new CustomEvent('deck-listo', { detail: deck }));
+  });
+
+  document.querySelector('.barra')!.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-accion]');
+    if (!b) return;
+    const a = b.dataset.accion;
+    if (a === 'anterior') deck.prev();
+    if (a === 'siguiente') deck.next();
+    if (a === 'escuchar') escuchar();
+    if (a === 'notas') {
+      const abierto = panel.classList.toggle('abierto');
+      btnNotas.setAttribute('aria-pressed', String(abierto));
+    }
+    if (a === 'pantalla') {
+      if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.();
+    }
+  });
+
+  // Decisiones: «inmediato» muestra la respuesta de la opción tocada; «grupo» espera a «Mostrar respuesta».
+  document.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    const op = t.closest<HTMLElement>('.opcion');
+    const rev = t.closest<HTMLElement>('[data-revelar]');
+    if (op) {
+      const dec = op.closest<HTMLElement>('.decision')!;
+      dec.querySelectorAll('.opcion').forEach((o) => o.setAttribute('aria-pressed', 'false'));
+      op.setAttribute('aria-pressed', 'true');
+      if (dec.dataset.modo === 'inmediato') {
+        dec.dataset.revelado = '';
+        dec.querySelectorAll('.respuesta').forEach((r) => r.classList.remove('visible'));
+        dec.querySelector(`.respuesta[data-de="${op.dataset.id}"]`)?.classList.add('visible');
+        const r = dec.querySelector<HTMLElement>('.respuesta.visible');
+        if (r) hablar(r.innerText);
+      }
+    }
+    if (rev) {
+      const dec = document.getElementById(rev.dataset.revelar!)!;
+      dec.dataset.revelado = '';
+      const r = dec.querySelector<HTMLElement>('.respuesta.final');
+      r?.classList.add('visible');
+      if (r) hablar(r.innerText);
+      rev.setAttribute('disabled', '');
+    }
+  });
+</script>

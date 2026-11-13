@@ -1,0 +1,114 @@
+/* Sistema visual: cuento infantil cálido y artesanal */
+:root {
+  --papel: #F3EBD9;
+  --pagina: #FBF6E8;
+  --tinta: #3C4035;
+  --tinta-suave: #5f6455;
+  --bosque: #3E6549;
+  --bosque-claro: #dfe8dc;
+  --arcilla: #AD523A;
+  --arcilla-claro: #f3dccf;
+  --miel: #D3A34C;
+  --miel-claro: #f6e6c3;
+  --linea: #d9cdb2;
+  --sombra: 0 2px 0 #e2d6bb, 0 10px 24px -14px rgba(60, 64, 53, .45);
+
+  --f-cuento: 'Bree Serif', Georgia, serif;
+  --f-nota: 'Caveat', 'Comic Sans MS', cursive;
+  --f-control: 'Nunito', system-ui, sans-serif;
+  --f-lectura: 'Atkinson Hyperlegible', 'Nunito', system-ui, sans-serif;
+
+  --r: 14px;
+  --r-grande: 22px;
+  --toque: 48px;
+  --toque-nino: 72px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--f-lectura);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(211,163,76,.08) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 64%, rgba(62,101,73,.06) 0 2px, transparent 3px);
+  background-size: 38px 38px, 53px 53px;
+}
+img, svg { max-width: 100%; display: block; }
+h1, h2, h3 { font-family: var(--f-cuento); font-weight: 400; line-height: 1.15; margin: 0 0 .4em; }
+h1 { font-size: clamp(2rem, 4vw, 3rem); }
+h2 { font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
+h3 { font-size: 1.3rem; }
+p { margin: 0 0 1em; }
+a { color: var(--bosque); text-underline-offset: 3px; }
+.nota { font-family: var(--f-nota); font-size: 1.45rem; color: var(--arcilla); line-height: 1.1; }
+
+:focus-visible { outline: 3px solid var(--arcilla); outline-offset: 3px; border-radius: 6px; }
+
+.contenedor { width: min(1180px, 100% - 2.5rem); margin-inline: auto; }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+  min-height: var(--toque); padding: .6rem 1.3rem;
+  font: 700 1.05rem/1.1 var(--f-control);
+  border-radius: 999px; border: 2px solid var(--tinta);
+  background: var(--pagina); color: var(--tinta); text-decoration: none;
+  cursor: pointer; box-shadow: 0 3px 0 var(--tinta);
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--tinta); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+.btn-principal { background: var(--bosque); color: #fff; border-color: #2c4a35; box-shadow: 0 3px 0 #2c4a35; }
+.btn-arcilla { background: var(--arcilla); color: #fff; border-color: #84392a; box-shadow: 0 3px 0 #84392a; }
+.btn-miel { background: var(--miel); color: var(--tinta); border-color: #9c7428; box-shadow: 0 3px 0 #9c7428; }
+.btn-texto { border: 0; box-shadow: none; background: transparent; text-decoration: underline; padding-inline: .4rem; }
+.btn-grande { min-height: 64px; font-size: 1.25rem; padding-inline: 1.8rem; }
+
+/* Libro abierto */
+.libro {
+  display: grid; grid-template-columns: 1fr 1fr;
+  background: var(--pagina); border-radius: var(--r-grande);
+  box-shadow: var(--sombra); position: relative; overflow: hidden;
+  border: 1px solid var(--linea);
+}
+.libro::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 36px; transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(60,64,53,.10) 45%, rgba(60,64,53,.16) 50%, rgba(60,64,53,.10) 55%, transparent);
+  pointer-events: none;
+}
+.libro > .hoja { padding: clamp(1.2rem, 3vw, 2.6rem); }
+@media (max-width: 760px) {
+  .libro { grid-template-columns: 1fr; }
+  .libro::after { display: none; }
+}
+
+.tarjeta {
+  background: var(--pagina); border: 1px solid var(--linea);
+  border-radius: var(--r); box-shadow: var(--sombra); padding: 1.25rem;
+}
+
+.etiqueta {
+  display: inline-block; font: 700 .8rem/1 var(--f-control); letter-spacing: .04em; text-transform: uppercase;
+  padding: .35rem .6rem; border-radius: 999px; background: var(--miel-claro); color: #6e5418;
+}
+.etiqueta.verde { background: var(--bosque-claro); color: var(--bosque); }
+.etiqueta.arcilla { background: var(--arcilla-claro); color: #84392a; }
+
+.oculto-visual { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.aviso {
+  border-left: 5px solid var(--miel); background: var(--miel-claro);
+  padding: .8rem 1rem; border-radius: 8px; font-size: .98rem;
+}
+.aviso.verde { border-color: var(--bosque); background: var(--bosque-claro); }
+.aviso.arcilla { border-color: var(--arcilla); background: var(--arcilla-claro); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

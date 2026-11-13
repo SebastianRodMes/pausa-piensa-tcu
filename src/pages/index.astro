@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import { PORTADAS } from '../lib/art';
+
+const rutas = [
+  { href: '/orientacion/', titulo: 'Orientación', texto: 'Cuentos, juegos y canciones sobre autoestima, convivencia, cuidado del cuerpo y proyecto de vida.', publico: 'Preescolar a tercero', art: PORTADAS.orientacion, color: 'verde' },
+  { href: '/seguridad/', titulo: 'Seguridad digital', texto: 'Charla y juego «Pausa, piensa y pide ayuda» sobre datos, claves, premios falsos y buen trato en línea.', publico: 'Cuarto a sexto', art: PORTADAS.seguridad, color: 'arcilla' },
+  { href: '/docentes/', titulo: 'Taller docente', texto: 'Crear, revisar y adaptar un recurso de clase con herramientas de inteligencia artificial.', publico: 'Personal docente', art: PORTADAS.docentes, color: '' },
+];
+---
+<Base title="Inicio">
+  <section class="contenedor portada">
+    <div class="libro intro">
+      <div class="hoja">
+        <p class="nota">¡Bienvenidas y bienvenidos!</p>
+        <h1>Una sola herramienta para orientar, cuidar y aprender</h1>
+        <p>Elegí un recorrido para presentar en la clase. Las actividades se controlan desde esta computadora y se proyectan; ningún niño necesita un teléfono propio.</p>
+        <div class="acciones">
+          <a class="btn btn-principal btn-grande" href="/participar/">Unirme a un juego</a>
+          <a class="btn" href="/facilitar/">Soy facilitador</a>
+        </div>
+      </div>
+      <div class="hoja tres-pasos" aria-label="Pausa, piensa y pide ayuda">
+        <div class="paso"><span style="background:var(--bosque)">⏸</span><strong>Pausa</strong><small>me detengo</small></div>
+        <div class="paso"><span style="background:var(--miel);color:var(--tinta)">?</span><strong>Piensa</strong><small>¿qué me piden?</small></div>
+        <div class="paso"><span style="background:var(--arcilla)">♥</span><strong>Pide ayuda</strong><small>a un adulto de confianza</small></div>
+      </div>
+    </div>
+
+    <h2 class="sr">Recorridos</h2>
+    <div class="rutas">
+      {rutas.map((r) => (
+        <a class="ruta" href={r.href}>
+          <div class="ruta-arte" set:html={r.art} />
+          <div class="ruta-txt">
+            <span class={`etiqueta ${r.color}`}>{r.publico}</span>
+            <h3>{r.titulo}</h3>
+            <p>{r.texto}</p>
+            <span class="ir">Abrir recorrido →</span>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <div class="aviso verde sin-red">
+      <strong>¿Sin internet en el aula?</strong> Si abriste esta página antes con conexión, las presentaciones y el juego en grupo siguen funcionando en este navegador. Mirá <a href="/recursos/">Recursos y respaldo</a>.
+    </div>
+  </section>
+</Base>
+
+<style>
+  .portada { padding-top: 2rem; display: grid; gap: 2rem; }
+  .intro .hoja:first-child { display: flex; flex-direction: column; justify-content: center; }
+  .acciones { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: .5rem; }
+  .tres-pasos { background: var(--papel); display: grid; gap: 1rem; align-content: center; }
+  .paso { display: grid; grid-template-columns: 64px 1fr; grid-template-rows: auto auto; column-gap: 1rem; align-items: center; background: var(--pagina); border-radius: 18px; padding: .8rem 1rem; border: 1px solid var(--linea); }
+  .paso span { grid-row: span 2; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; color: #fff; font: 800 1.6rem/1 var(--f-control); border: 3px solid var(--tinta); }
+  .paso strong { font: 400 1.6rem/1 var(--f-cuento); }
+  .paso small { font: 400 1.3rem/1.1 var(--f-nota); color: var(--arcilla); }
+  .sr { position: absolute; left: -9999px; }
+  .rutas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+  .ruta { text-decoration: none; color: inherit; background: var(--pagina); border: 1px solid var(--linea); border-radius: var(--r-grande); box-shadow: var(--sombra); overflow: hidden; display: flex; flex-direction: column; transition: transform .15s ease; }
+  .ruta:hover { transform: translateY(-3px) rotate(-.3deg); }
+  .ruta-arte { background: var(--papel); padding: 1rem 1.4rem .4rem; border-bottom: 1px dashed var(--linea); }
+  .ruta-txt { padding: 1.1rem 1.3rem 1.3rem; display: flex; flex-direction: column; gap: .5rem; flex: 1; }
+  .ruta-txt h3 { font-size: 1.7rem; margin: .2rem 0 0; }
+  .ruta-txt p { margin: 0; color: var(--tinta-suave); flex: 1; }
+  .ir { font: 800 1rem/1 var(--f-control); color: var(--bosque); }
+  @media (max-width: 900px) { .rutas { grid-template-columns: 1fr; } }
+</style>

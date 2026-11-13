@@ -1,0 +1,27 @@
+{
+  "name": "pausa-piensa-plataforma",
+  "version": "1.0.0",
+  "description": "Plataforma educativa TCU-505 - Escuela Arturo Quirós Carranza",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/build-sw.mjs",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "@fontsource/bree-serif": "^5.3.0",
+    "@fontsource/caveat": "^5.3.0",
+    "@fontsource/nunito": "^5.3.0",
+    "@supabase/supabase-js": "^2.119.0",
+    "astro": "^7.4.11",
+    "qrcode": "^1.5.4",
+    "reveal.js": "^6.0.2",
+    "typescript": "^7.0.2"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6"
+  },
+  "type": "module",
+  "private": true
+}

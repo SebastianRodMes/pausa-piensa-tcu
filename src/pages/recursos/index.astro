@@ -1,0 +1,87 @@
+---
+import Base from '../../layouts/Base.astro';
+import { MODULOS } from '../../content/orientacion';
+---
+<Base title="Recursos y respaldo" back={{ href: '/', label: 'Inicio' }}>
+  <section class="contenedor rec">
+    <h1>Recursos para la clase</h1>
+    <p>Todo lo que necesitás para usar la herramienta en el aula, con o sin internet.</p>
+
+    <div class="cols">
+      <div class="tarjeta">
+        <h2>Usar sin internet</h2>
+        <ol>
+          <li>Con internet, abrí esta página y los recorridos que vas a usar en el mismo navegador de la computadora de la clase.</li>
+          <li>El navegador guarda una copia. Al llegar sin red, abrí la misma dirección: las presentaciones, los módulos y el juego en grupo funcionan igual.</li>
+          <li>Lo que necesita internet: las salas con teléfonos y las herramientas externas del taller docente.</li>
+        </ol>
+        <p class="estado-sw" role="status">Revisando la copia sin conexión…</p>
+        <button class="btn btn-principal" id="precargar" type="button">Preparar copia sin conexión ahora</button>
+      </div>
+      <div class="tarjeta" id="tarjetas">
+        <h2>Tarjetas para jugar en grupo</h2>
+        <p>Imprimí y recortá una tarjeta «1» y una «2» por equipo. También se puede responder con los dedos.</p>
+        <div class="tarjetas-imp">
+          <div class="t uno">1</div><div class="t dos">2</div>
+        </div>
+        <button class="btn" type="button" onclick="window.print()">Imprimir tarjetas</button>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Lista de presentaciones</h2>
+      <table>
+        <thead><tr><th>Recorrido</th><th>Público</th><th>Duración</th><th>Abrir</th></tr></thead>
+        <tbody>
+          <tr><td>Seguridad digital: Pausa, piensa y pide ayuda</td><td>4.º a 6.º</td><td>45 min</td><td><a href="/seguridad/presentacion/">Abrir</a></td></tr>
+          <tr><td>Seguridad digital (versión breve)</td><td>4.º a 6.º</td><td>25 min</td><td><a href="/seguridad/corta/">Abrir</a></td></tr>
+          <tr><td>Taller docente</td><td>Personal docente</td><td>120 min</td><td><a href="/docentes/presentacion/">Abrir</a></td></tr>
+          {MODULOS.map((m) => (
+            <tr><td>Orientación: {m.titulo}</td><td>Preescolar · 1.º a 3.º</td><td>{m.duracion.preescolar} · {m.duracion.primaria}</td><td><a href={`/orientacion/${m.slug}/preescolar/`}>Preescolar</a> · <a href={`/orientacion/${m.slug}/primaria/`}>1.º a 3.º</a></td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tarjeta">
+      <h2>Atajos en las presentaciones</h2>
+      <p><b>→ / espacio</b> avanzar · <b>←</b> retroceder · <b>E</b> escuchar la consigna · <b>F</b> pantalla completa · <b>S</b> vista del presentador con notas · <b>O</b> vista general · <b>B</b> pausar con pantalla oscura.</p>
+      <p class="nota">Procedencia: ilustraciones, cuentos, estribillos y situaciones son originales del proyecto TCU-505. Narración con la voz del navegador.</p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const estado = document.querySelector('.estado-sw')!;
+  const btn = document.getElementById('precargar') as HTMLButtonElement;
+  async function revisar() {
+    if (!('serviceWorker' in navigator) || location.protocol !== 'https:') { estado.textContent = 'La copia sin conexión se activa en la versión publicada (https).'; btn.hidden = true; return; }
+    const reg = await navigator.serviceWorker.getRegistration();
+    estado.textContent = reg?.active ? '✓ Copia sin conexión lista en este navegador.' : 'La copia se prepara al abrir la página con internet.';
+  }
+  btn.addEventListener('click', async () => {
+    btn.disabled = true; estado.textContent = 'Preparando…';
+    try { await navigator.serviceWorker.register('/sw.js'); await navigator.serviceWorker.ready; estado.textContent = '✓ Copia sin conexión lista en este navegador.'; }
+    catch { estado.textContent = 'No se pudo preparar. Intentá de nuevo con internet.'; }
+    btn.disabled = false;
+  });
+  revisar();
+</script>
+
+<style>
+  .rec { padding-top: 2rem; display: grid; gap: 1.4rem; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  ol { display: grid; gap: .5rem; padding-left: 1.2rem; }
+  .estado-sw { font: 700 1rem/1.3 var(--f-control); color: var(--bosque); }
+  .tarjetas-imp { display: flex; gap: 1rem; margin: 1rem 0; }
+  .t { width: 140px; height: 180px; border: 4px solid var(--tinta); border-radius: 20px; display: grid; place-items: center; font: 800 6rem/1 var(--f-control); }
+  .t.uno { background: var(--miel); } .t.dos { background: var(--bosque); color: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: .98rem; }
+  th, td { text-align: left; padding: .55rem .5rem; border-bottom: 1px dashed var(--linea); }
+  th { font: 800 .85rem/1 var(--f-control); text-transform: uppercase; letter-spacing: .05em; color: var(--tinta-suave); }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } table { font-size: .9rem; } }
+  @media print {
+    :global(.cabecera), :global(.pie), h1, h1 + p, .cols > .tarjeta:first-child, .rec > .tarjeta, button, #tarjetas > p, #tarjetas > h2 { display: none !important; }
+    .cols { display: block; } .t { width: 45vw; height: 60vh; font-size: 14rem; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>

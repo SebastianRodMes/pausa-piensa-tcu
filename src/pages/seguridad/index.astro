@@ -1,0 +1,87 @@
+---
+import Base from '../../layouts/Base.astro';
+import { PORTADAS } from '../../lib/art';
+import { RONDAS, VERSION_SEGURIDAD } from '../../content/seguridad';
+---
+<Base title="Seguridad digital" back={{ href: '/', label: 'Inicio' }}>
+  <section class="contenedor prep">
+    <div class="libro">
+      <div class="hoja arte" set:html={PORTADAS.seguridad} />
+      <div class="hoja">
+        <span class="etiqueta arcilla">Cuarto a sexto grado</span>
+        <h1>Juguemos con cuidado</h1>
+        <p>Charla «Pausa, piensa y pide ayuda» con cinco situaciones de juegos en línea: datos personales, contraseñas, premios falsos, fotos y secretos, y buen trato.</p>
+
+        <fieldset class="grupo">
+          <legend>1. Duración</legend>
+          <label><input type="radio" name="dur" value="45" checked /> 45 minutos <small>(charla completa)</small></label>
+          <label><input type="radio" name="dur" value="25" /> 25 minutos <small>(versión breve)</small></label>
+        </fieldset>
+        <fieldset class="grupo">
+          <legend>2. ¿Cómo responde el grupo?</legend>
+          <label><input type="radio" name="modo" value="grupo" checked /> En grupo <small>(dedos o tarjetas, sin internet)</small></label>
+          <label><input type="radio" name="modo" value="tel" /> Con teléfonos <small>(un teléfono por equipo)</small></label>
+        </fieldset>
+
+        <div class="acciones">
+          <a class="btn btn-principal btn-grande" id="comenzar" href="/seguridad/presentacion/">Comenzar</a>
+          <a class="btn" href="/recursos/#tarjetas">Tarjetas 1 y 2</a>
+        </div>
+        <p class="ayuda" id="ayuda-tel" hidden>Con teléfonos: primero dá la charla con la presentación y, al llegar al juego, abrí <a href="/facilitar/">Soy facilitador</a> en otra pestaña para crear la sala. Si la red falla, seguí con la presentación en grupo: el contenido es el mismo.</p>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="tarjeta">
+        <h2>Antes de la sesión</h2>
+        <ul class="check">
+          <li><label><input type="checkbox" /> Proyector y sonido probados</label></li>
+          <li><label><input type="checkbox" /> Esta página abierta una vez con internet (queda disponible sin conexión)</label></li>
+          <li><label><input type="checkbox" /> Tarjetas «1» y «2» o acuerdo de responder con dedos</label></li>
+          <li><label><input type="checkbox" /> Docente u orientadora presente y enterada de la situación 4</label></li>
+        </ul>
+        <p class="aviso">Atajos: <b>→</b> avanzar, <b>E</b> escuchar consigna, <b>F</b> pantalla completa, <b>S</b> vista del presentador con notas.</p>
+      </div>
+      <div class="tarjeta">
+        <h2>Las cinco situaciones</h2>
+        <ol class="situaciones">
+          {RONDAS.map((r) => <li><strong>{r.tema}:</strong> «{r.mensaje}» <span class="nota">{r.frase}</span></li>)}
+        </ol>
+        <p class="pequeno">Versión del contenido: {VERSION_SEGURIDAD}. Situaciones y usuarios ficticios; no se muestran logos ni enlaces reales.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const comenzar = document.getElementById('comenzar') as HTMLAnchorElement;
+  const ayudaTel = document.getElementById('ayuda-tel')!;
+  function actualizar() {
+    const dur = (document.querySelector('input[name=dur]:checked') as HTMLInputElement).value;
+    const modo = (document.querySelector('input[name=modo]:checked') as HTMLInputElement).value;
+    comenzar.href = dur === '25' ? '/seguridad/corta/' : '/seguridad/presentacion/';
+    ayudaTel.hidden = modo !== 'tel';
+  }
+  document.querySelectorAll('input[type=radio]').forEach((i) => i.addEventListener('change', actualizar));
+  actualizar();
+</script>
+
+<style>
+  .prep { padding-top: 2rem; display: grid; gap: 1.6rem; }
+  .arte { background: var(--papel); display: grid; place-items: center; }
+  .grupo { border: 1px dashed var(--linea); border-radius: 14px; padding: .6rem 1rem 1rem; margin: 0 0 1rem; display: grid; gap: .5rem; }
+  .grupo legend { font: 800 1rem/1 var(--f-control); padding: 0 .4rem; }
+  .grupo label { display: flex; align-items: center; gap: .6rem; min-height: 44px; font: 700 1.05rem/1.2 var(--f-control); cursor: pointer; }
+  .grupo small { font-weight: 400; color: var(--tinta-suave); }
+  .grupo input { width: 22px; height: 22px; accent-color: var(--bosque); }
+  .acciones { display: flex; gap: .8rem; flex-wrap: wrap; }
+  .ayuda { margin-top: 1rem; font-size: .95rem; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .check { list-style: none; padding: 0; display: grid; gap: .4rem; }
+  .check label { display: flex; gap: .6rem; align-items: center; min-height: 40px; }
+  .check input { width: 20px; height: 20px; accent-color: var(--bosque); }
+  .situaciones { display: grid; gap: .6rem; padding-left: 1.2rem; }
+  .situaciones .nota { display: block; font-size: 1.25rem; }
+  .pequeno { font-size: .88rem; color: var(--tinta-suave); }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,89 @@
+---
+import Base from '../../layouts/Base.astro';
+import { MODULOS, NIVELES } from '../../content/orientacion';
+import { dibujo, PORTADAS } from '../../lib/art';
+---
+<Base title="Orientación" back={{ href: '/', label: 'Inicio' }}>
+  <section class="contenedor cat">
+    <div class="encabezado">
+      <div>
+        <span class="etiqueta verde">Para la orientadora y docentes</span>
+        <h1>Orientación</h1>
+        <p>Elegí el nivel del grupo y el tema de la clase. Cada módulo tiene cuento, decisiones con imágenes, una pausa activa y un estribillo. Nadie necesita leer ni escribir.</p>
+      </div>
+      <div class="arte" set:html={PORTADAS.orientacion} />
+    </div>
+
+    <div class="niveles" role="radiogroup" aria-label="Nivel del grupo">
+      {NIVELES.map((n) => (
+        <button type="button" class="nivel" role="radio" aria-checked={n.id === 'primaria' ? 'true' : 'false'} data-nivel={n.id}>
+          <strong>{n.nombre}</strong><small>{n.detalle}</small>
+        </button>
+      ))}
+    </div>
+
+    <div class="modulos">
+      {MODULOS.map((m) => (
+        <article class="modulo">
+          <div class="m-arte" set:html={dibujo(m.portada, m.titulo)} />
+          <div class="m-txt">
+            <span class="etiqueta">{m.tema}</span>
+            <h2>{m.titulo}</h2>
+            <p>{m.objetivo}</p>
+            <p class="dur" data-dur-pre={m.duracion.preescolar} data-dur-pri={m.duracion.primaria}>⏱ {m.duracion.primaria}</p>
+            {m.sensible && <p class="aviso arcilla">Tema sensible: lo conduce la orientadora, con el protocolo de protección de la escuela.</p>}
+            <a class="btn btn-principal presentar" data-slug={m.slug} href={`/orientacion/${m.slug}/primaria/`}>Presentar</a>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <details class="tarjeta guia">
+      <summary>Cómo usar los módulos en clase</summary>
+      <ol>
+        <li>Proyectá la presentación y usá <b>🔊 Escuchar</b> para narrar cada pantalla (o leela vos).</li>
+        <li>En las decisiones, los niños señalan o levantan la mano; tocá la opción que elija el grupo y aparece la explicación.</li>
+        <li>Las actividades de cierre se hacen sin pantalla, en el cuaderno o con el cuerpo.</li>
+        <li>La evaluación es por observación del ejemplo ficticio. No se piden historias personales.</li>
+        <li>Si un niño revela una situación preocupante, se aplica el protocolo de la escuela. La herramienta no registra denuncias.</li>
+      </ol>
+    </details>
+  </section>
+</Base>
+
+<script>
+  const KEY = 'orientacion-nivel';
+  const params = new URLSearchParams(location.search);
+  let nivel = params.get('nivel') || (() => { try { return localStorage.getItem(KEY); } catch { return null; } })() || 'primaria';
+  function aplicar(n: string) {
+    nivel = n;
+    try { localStorage.setItem(KEY, n); } catch {}
+    document.querySelectorAll<HTMLElement>('.nivel').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.nivel === n)));
+    document.querySelectorAll<HTMLAnchorElement>('.presentar').forEach((a) => (a.href = `/orientacion/${a.dataset.slug}/${n}/`));
+    document.querySelectorAll<HTMLElement>('.dur').forEach((d) => (d.textContent = '⏱ ' + (n === 'preescolar' ? d.dataset.durPre : d.dataset.durPri)));
+  }
+  document.querySelectorAll<HTMLElement>('.nivel').forEach((b) => b.addEventListener('click', () => aplicar(b.dataset.nivel!)));
+  aplicar(nivel);
+</script>
+
+<style>
+  .cat { padding-top: 2rem; display: grid; gap: 1.6rem; }
+  .encabezado { display: grid; grid-template-columns: 1.4fr 1fr; gap: 2rem; align-items: center; }
+  .arte { width: 100%; max-width: 380px; justify-self: end; }
+  .niveles { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .nivel { text-align: left; border: 2px solid var(--linea); background: var(--pagina); border-radius: 18px; padding: 1rem 1.2rem; cursor: pointer; min-height: 72px; display: grid; gap: .2rem; color: var(--tinta); }
+  .nivel strong { font: 400 1.5rem/1.1 var(--f-cuento); }
+  .nivel small { font: 400 1rem/1.3 var(--f-lectura); color: var(--tinta-suave); }
+  .nivel[aria-checked="true"] { border-color: var(--bosque); background: var(--bosque-claro); box-shadow: 0 3px 0 var(--bosque); }
+  .modulos { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .modulo { display: grid; grid-template-columns: 200px 1fr; background: var(--pagina); border: 1px solid var(--linea); border-radius: var(--r-grande); box-shadow: var(--sombra); overflow: hidden; }
+  .m-arte { background: var(--papel); display: grid; place-items: center; padding: .8rem; border-right: 1px dashed var(--linea); }
+  .m-txt { padding: 1.1rem 1.3rem; display: flex; flex-direction: column; gap: .5rem; align-items: flex-start; }
+  .m-txt h2 { font-size: 1.7rem; margin: 0; }
+  .m-txt p { margin: 0; }
+  .dur { font: 700 .95rem/1 var(--f-control); color: var(--tinta-suave); }
+  .m-txt .aviso { font-size: .9rem; }
+  .guia summary { font: 400 1.3rem/1.2 var(--f-cuento); cursor: pointer; }
+  .guia ol { display: grid; gap: .4rem; margin-top: 1rem; }
+  @media (max-width: 900px) { .encabezado, .modulos, .niveles { grid-template-columns: 1fr; } .arte { justify-self: start; } .modulo { grid-template-columns: 1fr; } .m-arte { border-right: 0; border-bottom: 1px dashed var(--linea); } }
+</style>

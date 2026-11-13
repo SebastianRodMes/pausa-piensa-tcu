@@ -1,0 +1,78 @@
+---
+import '@fontsource/bree-serif/400.css';
+import '@fontsource/caveat/600.css';
+import '@fontsource/nunito/400.css';
+import '@fontsource/nunito/700.css';
+import '@fontsource/nunito/800.css';
+import '@fontsource/atkinson-hyperlegible/400.css';
+import '@fontsource/atkinson-hyperlegible/700.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  bare?: boolean; // sin encabezado ni pie (presentaciones y proyección)
+  back?: { href: string; label: string };
+}
+const { title, description = 'Herramienta educativa de orientación, seguridad digital y formación docente. Escuela Arturo Quirós Carranza, Orotina.', bare = false, back } = Astro.props;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#3E6549" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>{title} · Pausa, piensa y aprende</title>
+  </head>
+  <body class={bare ? 'bare' : ''}>
+    {!bare && (
+      <header class="cabecera">
+        <div class="contenedor cabecera-in">
+          <a href="/" class="marca" aria-label="Ir al inicio">
+            <svg viewBox="0 0 48 48" width="38" height="38" aria-hidden="true">
+              <path d="M6 12c6-3 12-3 18 1v26c-6-4-12-4-18-1z" fill="#FBF6E8" stroke="#3C4035" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="M42 12c-6-3-12-3-18 1v26c6-4 12-4 18-1z" fill="#F6E6C3" stroke="#3C4035" stroke-width="2.2" stroke-linejoin="round"/>
+              <circle cx="33" cy="22" r="4" fill="#3E6549"/>
+              <path d="M11 20h8M11 25h8M11 30h6" stroke="#AD523A" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>
+              <strong>Pausa, piensa y aprende</strong>
+              <small>Escuela Arturo Quirós Carranza · Orotina</small>
+            </span>
+          </a>
+          {back && <a class="btn btn-texto volver" href={back.href}>← {back.label}</a>}
+        </div>
+      </header>
+    )}
+    <main id="contenido">
+      <slot />
+    </main>
+    {!bare && (
+      <footer class="pie">
+        <div class="contenedor">
+          <p>Proyecto TCU-505 «Alfabetización digital como motor para el desarrollo y la inclusión en Costa Rica» · Universidad Técnica Nacional, Sede del Pacífico.</p>
+          <p class="nota">Personajes y situaciones ficticias. Esta herramienta no guarda datos personales de niñas y niños.</p>
+        </div>
+      </footer>
+    )}
+    <script>
+      if ('serviceWorker' in navigator && location.protocol === 'https:') {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  .cabecera { padding: .9rem 0; border-bottom: 1px dashed var(--linea); }
+  .cabecera-in { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .marca { display: flex; align-items: center; gap: .7rem; text-decoration: none; color: var(--tinta); }
+  .marca strong { display: block; font-family: var(--f-cuento); font-weight: 400; font-size: 1.25rem; line-height: 1.1; }
+  .marca small { display: block; font-family: var(--f-control); font-size: .85rem; color: var(--tinta-suave); }
+  .pie { margin-top: 4rem; padding: 1.6rem 0 2.2rem; border-top: 1px dashed var(--linea); font-size: .92rem; color: var(--tinta-suave); }
+  .pie .nota { font-size: 1.25rem; }
+  @media (max-width: 560px) { .marca small { display: none; } .volver { font-size: .95rem; } }
+</style>

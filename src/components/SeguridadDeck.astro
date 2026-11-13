@@ -1,0 +1,112 @@
+---
+import Deck from './Deck.astro';
+import { BLOQUES, RONDAS, RETO, CIERRE } from '../content/seguridad';
+import { dibujo, ESCENAS } from '../lib/art';
+interface Props { corta?: boolean }
+const { corta = false } = Astro.props;
+const bloques = BLOQUES.filter((b) => (corta ? b.min25 : b.min45) > 0);
+const reto = corta ? RETO.slice(0, 1) : RETO;
+const total = corta ? 25 : 45;
+---
+<Deck salir="/seguridad/" titulo="Pausa, piensa y pide ayuda">
+  <section data-consigna="Pausa, piensa y pide ayuda. Una charla para cuidarnos cuando jugamos en línea.">
+    <div class="hoja-doble">
+      <div class="izq" set:html={ESCENAS.trespasos('Tres círculos: pausa, piensa y pide ayuda')} />
+      <div class="der">
+        <span class="kicker">Seguridad digital · {total} minutos</span>
+        <h1>Pausa, piensa y pide ayuda</h1>
+        <p class="nota">Cuidarnos cuando jugamos en línea</p>
+      </div>
+    </div>
+    <aside class="notes">Antes de empezar: probar volumen, proyector y tener a mano las tarjetas «1» y «2». Duración prevista: {total} minutos. Juego: unos 12 minutos.</aside>
+  </section>
+
+  {bloques.map((b, i) => (
+    <section data-consigna={b.consigna}>
+      <div class="hoja-doble">
+        <div class="izq" set:html={dibujo(b.dibujo, b.titulo)} />
+        <div class="der">
+          <span class="kicker">Parte {i + 1} · {corta ? b.min25 : b.min45} min</span>
+          <h2>{b.titulo}</h2>
+          {b.texto.map((t, j) => (j === 0 ? <p>{t}</p> : <p class="nota">{t}</p>))}
+        </div>
+      </div>
+      <aside class="notes">{b.notas}</aside>
+    </section>
+  ))}
+
+  <section data-consigna="¡Vamos a jugar! Formen equipos. Para cada situación, conversen y respondan con un dedo para la opción uno o dos dedos para la opción dos. No hay puntos ni ganadores: practicamos cómo cuidarnos.">
+    <div class="hoja-doble">
+      <div class="izq" set:html={dibujo('escena:bienvenida', 'Tortuga y niña listas para jugar')} />
+      <div class="der">
+        <span class="kicker">Juego · 12 min</span>
+        <h2>¡A jugar en equipos!</h2>
+        <p>Cinco situaciones. Conversen y respondan:</p>
+        <div class="tres" style="margin-top:6px">
+          <span style="background:var(--miel);color:var(--tinta)">☝ 1</span>
+          <span style="background:var(--bosque)">✌ 2</span>
+        </div>
+        <p class="nota">No hay puntos ni ganadores.</p>
+      </div>
+    </div>
+    <aside class="notes">Si hay sala con teléfonos, usar «Soy facilitador» en el inicio. En modo grupo: contar cuántos equipos eligen cada opción y anotarlo para la bitácora (sin nombres).</aside>
+  </section>
+
+  {RONDAS.map((r, i) => (
+    <section data-consigna={r.consigna} data-ronda={i}>
+      <div class="hoja-doble">
+        <div class="izq" style="align-content:center;gap:18px">
+          <div set:html={dibujo(r.escena, r.tema)} />
+          <div class="burbuja"><small>{r.personaje} escribe:</small>«{r.mensaje}»</div>
+        </div>
+        <div class="der decision" id={`dec-${r.id}`} data-modo="grupo">
+          <span class="kicker">Situación {i + 1} de {RONDAS.length} · {r.tema}</span>
+          <h3>¿Qué hacés?</h3>
+          <div class="opciones">
+            {r.opciones.map((o, k) => (
+              <button type="button" class={`opcion ${o.cuidado ? 'es-cuidado' : ''}`} data-id={o.id} aria-pressed="false">
+                <span class="num">{k + 1}</span>
+                <span set:html={dibujo(o.dibujo, o.texto)} />
+                {o.texto}
+              </button>
+            ))}
+          </div>
+          <button type="button" class="btn btn-principal" data-revelar={`dec-${r.id}`} style="align-self:flex-start">Mostrar respuesta</button>
+          <div class="respuesta final"><strong>{r.frase}</strong>{r.explicacion}</div>
+        </div>
+      </div>
+      <aside class="notes">Dejar 1 minuto para que los equipos conversen. Contar: ¿cuántos equipos eligieron la opción de cuidado? Después de mostrar la respuesta, preguntar a un equipo por qué. Opción de cuidado: {r.opciones.findIndex((o) => o.cuidado) + 1}.</aside>
+    </section>
+  ))}
+
+  {reto.map((c, i) => (
+    <section data-consigna={`Reto final. ${c.caso} ¿Qué harían?`}>
+      <div class="hoja-unica decision" id={`reto-${i}`} data-modo="grupo">
+        <span class="kicker">Lo que aprendimos · reto {i + 1} de {reto.length}</span>
+        <h2>{c.caso}</h2>
+        <p class="nota">¿Qué harían? Pulgar arriba si saben cómo cuidarse.</p>
+        <button type="button" class="btn btn-principal btn-grande" data-revelar={`reto-${i}`} style="align-self:flex-start">Ver la decisión de cuidado</button>
+        <div class="respuesta final">{c.cuidado}</div>
+      </div>
+      <aside class="notes">Evaluación por observación: ¿el grupo identifica una decisión de cuidado y una forma de pedir ayuda? Registrar el resultado agregado, sin nombres.</aside>
+    </section>
+  ))}
+
+  <section data-consigna={`${CIERRE.texto} ${CIERRE.tarea}`}>
+    <div class="hoja-doble">
+      <div class="izq" set:html={dibujo('escena:ayuda', 'Niño pidiendo ayuda a una persona adulta')} />
+      <div class="der">
+        <span class="kicker">Cierre</span>
+        <h2>{CIERRE.titulo}</h2>
+        <div class="tres">
+          <span style="background:var(--bosque)">Pausa</span>
+          <span style="background:var(--miel);color:var(--tinta)">Piensa</span>
+          <span style="background:var(--arcilla)">Pide ayuda</span>
+        </div>
+        <p>{CIERRE.texto}</p>
+        <p class="nota">{CIERRE.tarea}</p>
+      </div>
+    </div>
+    <aside class="notes">Repetir las tres palabras con gestos. Recordar a quién acudir en la escuela. Anotar en la bitácora: fecha, grupo, duración y resultado agregado del juego.</aside>
+  </section>
+</Deck>

@@ -1,0 +1,54 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Deck from '../../../components/Deck.astro';
+import { BLOQUES_TALLER, HERRAMIENTAS } from '../../../content/docentes';
+import { PORTADAS } from '../../../lib/art';
+const total = BLOQUES_TALLER.reduce((a, b) => a + b.min, 0);
+---
+<Base title="Taller docente" bare>
+  <Deck salir="/docentes/" titulo="Taller docente">
+    <section data-consigna="Creamos un recurso para nuestra clase. Taller práctico de dos horas.">
+      <div class="hoja-doble">
+        <div class="izq" set:html={PORTADAS.docentes} />
+        <div class="der">
+          <span class="kicker">Taller docente · {total} minutos</span>
+          <h1>Creamos un recurso para nuestra clase</h1>
+          <p>Pedir · crear · comprobar · adaptar · compartir</p>
+          <p class="nota">Con ejemplos ficticios, sin datos de estudiantes.</p>
+        </div>
+      </div>
+      <aside class="notes">Producto de salida: una ficha con objetivo, instrucción, recurso corregido, cambios hechos por el docente y una comprobación. Revisar acceso a internet y cuentas antes de iniciar.</aside>
+    </section>
+    {BLOQUES_TALLER.map((b, i) => (
+      <section data-consigna={`${b.titulo}. ${b.objetivo}`}>
+        <div class="hoja-doble" style={b.ejemplo ? '' : 'grid-template-columns:1fr'}>
+          {b.ejemplo && (
+            <div class="izq" style="align-content:center;gap:16px;place-items:stretch">
+              {b.ejemplo.antes && <div class="caja-ejemplo"><b>Antes</b>«{b.ejemplo.antes}»</div>}
+              {b.ejemplo.despues && <div class="caja-ejemplo"><b>Después</b>«{b.ejemplo.despues}»</div>}
+              {b.ejemplo.texto && <div class="caja-ejemplo"><b>{b.ejemplo.titulo}</b>{b.ejemplo.texto}</div>}
+            </div>
+          )}
+          <div class="der" style={b.ejemplo ? '' : 'padding:56px 120px'}>
+            <span class="kicker">Bloque {i + 1} de {BLOQUES_TALLER.length}</span>
+            <span class="chip-min">⏱ {b.min} minutos</span>
+            <h2>{b.titulo}</h2>
+            <p class="nota">{b.objetivo}</p>
+            <ol class="lista-pasos">{b.pasos.map((p) => <li>{p}</li>)}</ol>
+            {(b.id === 'crear') && (
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                {HERRAMIENTAS.map((h) => <a class="btn" href={h.href} target="_blank" rel="noopener">Abrir {h.nombre} ↗</a>)}
+              </div>
+            )}
+            {b.enlaces && b.enlaces.length > 0 && (
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                {b.enlaces.map((l) => <a class="btn btn-principal" href={l.href} target={l.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{l.texto}{l.href.startsWith('http') ? ' ↗' : ''}</a>)}
+              </div>
+            )}
+          </div>
+        </div>
+        {b.notas && <aside class="notes">{b.notas}</aside>}
+      </section>
+    ))}
+  </Deck>
+</Base>

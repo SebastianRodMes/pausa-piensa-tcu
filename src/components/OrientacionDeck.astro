@@ -1,0 +1,86 @@
+---
+import Deck from './Deck.astro';
+import { NIVELES, type Modulo, type Nivel } from '../content/orientacion';
+import { dibujo } from '../lib/art';
+interface Props { modulo: Modulo; nivel: Nivel }
+const { modulo, nivel } = Astro.props;
+const nombreNivel = NIVELES.find((n) => n.id === nivel)!.nombre;
+const escenas = modulo.escenas[nivel];
+---
+<Deck salir={`/orientacion/?nivel=${nivel}`} titulo={modulo.titulo}>
+  <section data-consigna={`${modulo.titulo}. Hoy vamos a hablar de ${modulo.tema.toLowerCase()}.`}>
+    <div class="hoja-doble">
+      <div class="izq" set:html={dibujo(modulo.portada, modulo.titulo)} />
+      <div class="der">
+        <span class="kicker">Orientación · {nombreNivel} · {modulo.duracion[nivel]}</span>
+        <h1>{modulo.titulo}</h1>
+        <p class="nota">{modulo.tema}</p>
+      </div>
+    </div>
+    <aside class="notes">
+      <p><b>Objetivo:</b> {modulo.objetivo}</p>
+      {modulo.sensible && <p><b>Tema sensible:</b> lo conduce la orientadora. No se piden relatos personales. Si surge una revelación: escuchar sin interrogar frente al grupo, no prometer secreto y activar el protocolo de protección de la escuela.</p>}
+      <p>Evaluación por observación: comprensión del ejemplo ficticio, no la vida personal del niño.</p>
+    </aside>
+  </section>
+
+  {escenas.map((e, i) => {
+    if (e.tipo === 'cuento') return (
+      <section data-consigna={e.consigna}>
+        <div class="hoja-doble">
+          <div class="izq" set:html={dibujo(e.dibujo, e.titulo)} />
+          <div class="der">
+            <span class="kicker">Cuento · {i + 1} de {escenas.length}</span>
+            <h2>{e.titulo}</h2>
+            <p>{e.texto}</p>
+            <p class="nota">Tocá 🔊 Escuchar</p>
+          </div>
+        </div>
+        {e.notas && <aside class="notes">{e.notas}</aside>}
+      </section>
+    );
+    if (e.tipo === 'decision') return (
+      <section data-consigna={e.consigna}>
+        <div class={`hoja-unica decision ${e.abierta ? 'abierta' : ''}`} data-modo="inmediato" style={`--n:${e.opciones.length}`}>
+          <span class="kicker">{e.abierta ? 'Conversamos' : 'Decidimos'} · {i + 1} de {escenas.length}</span>
+          <h2>{e.pregunta}</h2>
+          <div class="opciones">
+            {e.opciones.map((o, k) => (
+              <button type="button" class={`opcion ${o.cuidado ? 'es-cuidado' : ''}`} data-id={`o${k}`} aria-pressed="false">
+                <span set:html={dibujo(o.dibujo, o.texto)} />
+                {o.texto}
+              </button>
+            ))}
+          </div>
+          {e.opciones.map((o, k) => <div class="respuesta" data-de={`o${k}`}>{o.respuesta}</div>)}
+        </div>
+        <aside class="notes">{e.notas ?? (e.abierta ? 'Todas las respuestas son válidas. Invitar a varios niños a señalar.' : 'Tocar la opción que elija la mayoría; la explicación aparece y se escucha.')}</aside>
+      </section>
+    );
+    if (e.tipo === 'movimiento') return (
+      <section data-consigna={e.consigna}>
+        <div class="hoja-doble">
+          <div class="izq" set:html={dibujo('tortuga:feliz', 'Tito la tortuga')} />
+          <div class="der">
+            <span class="kicker">Pausa activa</span>
+            <h2>{e.titulo}</h2>
+            <p>{e.texto}</p>
+            <p class="nota">¡Todos de pie!</p>
+          </div>
+        </div>
+        {e.notas && <aside class="notes">{e.notas}</aside>}
+      </section>
+    );
+    return (
+      <section data-consigna={e.consigna}>
+        <div class="hoja-unica" style="text-align:center;align-items:center">
+          <span class="kicker">Cierre</span>
+          <h2>{e.titulo}</h2>
+          <p class="estribillo">«{e.estribillo}»</p>
+          <p class="nota" style="max-width:900px">{e.actividad}</p>
+        </div>
+        <aside class="notes">Repetir el estribillo dos veces, con palmas. {e.notas ?? ''}</aside>
+      </section>
+    );
+  })}
+</Deck>
