@@ -61,6 +61,8 @@ tests/            Pruebas de permisos de las salas
 Sin estos datos el sitio funciona igual; solo se oculta el juego con teléfonos y se ofrece el modo en grupo.
 
 ### Publicar en Vercel
+Versión publicada: https://pausa-piensa-tcu.vercel.app
+
 Importar el repositorio en Vercel (framework: Astro, comando `npm run build`, salida `dist`), agregar las dos variables de entorno y publicar.
 
 ### Pruebas de las salas
