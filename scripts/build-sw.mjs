@@ -8,7 +8,7 @@ const archivos = [];
   for (const n of readdirSync(dir)) {
     const p = join(dir, n);
     if (statSync(p).isDirectory()) rec(p);
-    else if (!n.endsWith('.map') && n !== 'sw.js' && !/\.woff$/.test(n) && !/(cyrillic|greek|vietnamese|latin-ext)/.test(n)) archivos.push('/' + relative(dist, p).split(sep).join('/'));
+    else if (!n.endsWith('.map') && n !== 'sw.js' && !p.includes('evidencias') && !/\.woff$/.test(n) && !/(cyrillic|greek|vietnamese|latin-ext)/.test(n)) archivos.push('/' + relative(dist, p).split(sep).join('/'));
   }
 })(dist);
 const urls = archivos.map((u) => u.replace(/index\.html$/, ''));
