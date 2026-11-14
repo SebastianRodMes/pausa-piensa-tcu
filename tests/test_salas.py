@@ -8,7 +8,12 @@ def call(sql, *a):
     except Exception as e: return 'ERROR: ' + str(e).split('\n')[0]
 FAC, FAC2 = '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222'
 T1, T2, T3 = ['aaaaaaaa-0000-0000-0000-00000000000%d' % i for i in (1,2,3)]
+c.execute('reset role'); c.execute("delete from public.facilitators where user_id = '22222222-2222-2222-2222-222222222222'")
+como(FAC2, False); ok0 = 'solo_facilitador' in str(call('select public.create_room()'))
+c.execute('reset role')
 ok = lambda cond, msg: print(('PASA ' if cond else 'FALLA'), msg)
+ok(ok0, 'adulto fuera de la lista no crea salas')
+c.execute("insert into public.facilitators values ('11111111-1111-1111-1111-111111111111') on conflict do nothing")
 como(FAC, False); r = call("select public.create_room()"); room, code = r['room_id'], r['code']
 como(T1, True); ok('ERROR' in str(call("select public.peek_room('000000')")) or code == '000000', 'código incorrecto rechazado')
 j = call("select public.join_room(%s,'Rayo')", code); ok(j['name'] == 'Rayo', 'equipo 1 entra')

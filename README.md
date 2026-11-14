@@ -53,10 +53,11 @@ tests/            Pruebas de permisos de las salas
 ### Activar las salas con teléfonos (Supabase)
 1. Crear un proyecto en Supabase (plan gratuito).
 2. Ejecutar `supabase/migrations/20261112000000_salas.sql` en el editor SQL.
-3. *Authentication → Sign In / Providers*: activar **Allow anonymous sign-ins** y **desactivar** *Allow new users to sign up*.
-4. *Authentication → Users → Add user*: crear la cuenta de la persona facilitadora (correo y contraseña).
-5. Copiar la URL del proyecto y la clave pública (anon) en `.env` (ver `.env.example`) o en las variables de entorno de Vercel: `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_ANON_KEY`. **Nunca** usar la clave `service_role` en el sitio.
-6. Probar con 2 o 3 teléfonos en la red de la escuela antes de usarlo en clase (Supabase limita los ingresos anónimos por IP).
+3. *Authentication → Sign In / Providers*: activar **Allow anonymous sign-ins** y dejar **activado** *Allow new users to sign up* (Supabase bloquea el acceso anónimo si el registro está apagado).
+4. *Authentication → Users → Add user*: crear la cuenta de la persona facilitadora (correo y contraseña, con *Auto Confirm User*).
+5. Habilitarla como facilitadora en el editor SQL: `insert into public.facilitators (user_id) select id from auth.users where email = 'correo@ejemplo.com';`. Solo las cuentas de esa lista pueden crear salas, aunque alguien más se registre.
+6. Copiar la URL del proyecto y la clave pública (anon) en `.env` (ver `.env.example`) o en las variables de entorno de Vercel: `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_ANON_KEY`. **Nunca** usar la clave `service_role` en el sitio.
+7. Probar con 2 o 3 teléfonos en la red de la escuela antes de usarlo en clase (Supabase limita los ingresos anónimos por IP).
 
 Sin estos datos el sitio funciona igual; solo se oculta el juego con teléfonos y se ofrece el modo en grupo.
 
@@ -66,7 +67,7 @@ Versión publicada: https://pausa-piensa-tcu.vercel.app
 Importar el repositorio en Vercel (framework: Astro, comando `npm run build`, salida `dist`), agregar las dos variables de entorno y publicar.
 
 ### Pruebas de las salas
-`tests/test_salas.py` crea salas y equipos en un PostgreSQL local (con `tests/stub_auth.sql` imitando `auth`) y comprueba: solo el facilitador crea salas, nombres únicos, reconexión, respuestas sin duplicar, rechazo de respuestas tardías, aislamiento entre salas y que los equipos no ven conteos hasta cerrar la pregunta.
+`tests/test_salas.py` crea salas y equipos en un PostgreSQL local (con `tests/stub_auth.sql` imitando `auth`) y comprueba: solo los facilitadores habilitados crean salas, nombres únicos, reconexión, respuestas sin duplicar, rechazo de respuestas tardías, aislamiento entre salas y que los equipos no ven conteos hasta cerrar la pregunta.
 
 ## Créditos
 Contenidos, ilustraciones, cuentos y estribillos: originales del proyecto. Fuentes de referencia: UNICEF (acoso escolar), NSPCC Learning, avisos de seguridad de Roblox y Garena sobre ofertas falsas. Desarrollado como Trabajo Comunal Universitario, 2026.
