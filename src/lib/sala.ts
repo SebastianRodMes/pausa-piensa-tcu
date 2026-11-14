@@ -37,6 +37,7 @@ const MENSAJES: Record<string, string> = {
 export function mensajeError(e: unknown): string {
   const m = (e as any)?.message || String(e);
   for (const k of Object.keys(MENSAJES)) if (m.includes(k)) return MENSAJES[k];
+  if (/anonymous/i.test(m)) return 'Las salas todavía no aceptan teléfonos: la persona facilitadora debe activar el acceso anónimo en Supabase.';
   if (/fetch|network|Failed/i.test(m)) return 'Sin conexión. Si no vuelve, sigan jugando en grupo.';
   if (/rate|too many/i.test(m)) return 'Demasiados intentos desde esta red. Esperen un momento o jueguen en grupo.';
   return 'Algo salió mal. Intenten de nuevo.';
